@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Playable Ad Samples</title>
+<style>
+  :root { --bg: #f3f1ec; --ink: #1c1b22; --mute: #6a6876; --card: #ffffff; --line: #dcd9d1; --accent: #3b5bdb; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 16px 48px; }
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  h1 { margin: 0; font-size: 30px; letter-spacing: -.02em; }
+  .lead { margin: 6px 0 0; color: var(--mute); font-size: 16px; line-height: 1.5; max-width: 620px; }
+  .lang { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--card); flex: none; }
+  .lang button { font: inherit; font-size: 14px; border: 0; background: none; padding: 8px 14px; cursor: pointer; color: var(--mute); }
+  .lang button.on { background: var(--ink); color: #fff; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
+  .list { display: grid; gap: 14px; }
+  .item { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 16px; align-items: center; background: var(--card); border: 2px solid var(--line);
+    border-radius: 18px; padding: 14px; cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
+  .item:hover { border-color: #b9b5aa; }
+  .item.on { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 91, 219, .14); }
+  .sw { width: 84px; height: 84px; border-radius: 14px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; overflow: hidden; }
+  .sw i { display: block; }
+  .item h2 { margin: 0 0 3px; font-size: 20px; }
+  .meta { color: var(--mute); font-size: 14.5px; line-height: 1.45; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag { font-size: 12.5px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--mute); }
+  .stage { position: sticky; top: 20px; }
+  .phone { width: 340px; height: 640px; border-radius: 38px; background: #1c1b22; padding: 12px; box-shadow: 0 18px 40px rgba(28, 27, 34, .22); }
+  .phone iframe { width: 100%; height: 100%; border: 0; border-radius: 28px; background: #fff; display: block; }
+  .under { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 14px; color: var(--mute); }
+  .under a { color: var(--accent); }
+  .under button, .close { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 7px 14px; cursor: pointer; color: var(--ink); }
+  .specs { margin-top: 30px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+  .specs h3 { margin: 0 0 8px; font-size: 17px; }
+  .specs ul { margin: 0; padding-left: 20px; color: var(--mute); line-height: 1.7; font-size: 15px; }
+  .close { display: none; }
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; }
+    .stage { display: none; position: fixed; inset: 0; background: rgba(28, 27, 34, .92); z-index: 10; padding: 12px; flex-direction: column; align-items: center; justify-content: center; }
+    .stage.open { display: flex; }
+    .phone { width: min(92vw, 52vh); height: min(84vh, 164vw); border-radius: 26px; padding: 8px; }
+    .phone iframe { border-radius: 18px; }
+    .under { width: min(92vw, 52vh); color: #cfcdd6; }
+    .under a { color: #a9b8ff; }
+    .close { display: inline-block; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 data-t="title"></h1>
+      <p class="lead" data-t="lead"></p>
+    </div>
+    <div class="lang"><button id="en">English</button><button id="ko">한국어</button></div>
+  </header>
+  <div class="layout">
+    <div class="list" id="list"></div>
+    <div class="stage" id="stage">
+      <div class="phone"><iframe id="frame" title="Playable preview" allow="autoplay"></iframe></div>
+      <div class="under">
+        <button id="restart" data-t="restart"></button>
+        <a id="open" target="_blank" rel="noopener" data-t="open"></a>
+        <button class="close" id="close" data-t="close"></button>
+      </div>
+    </div>
+  </div>
+  <div class="specs">
+    <h3 data-t="specTitle"></h3>
+    <ul id="specs"></ul>
+  </div>
+</div>
+<script>
+"use strict";
+var SAMPLES = [
+  { file: "yarn-rescue-playable.html", name: ["Yarn Rescue", "실타래 구조대"], genre: ["Yarn / color-unravel puzzle", "실 감기 퍼즐"], style: ["Cozy handcraft, pastel", "아늑한 수공예, 파스텔"],
+    input: ["Tap", "탭"], kb: 302, sw: ["#f7e6ef", "#ef4f5f", "#f78fb8", "#5b3f6e"] },
+  { file: "glow-jars-playable.html", name: ["Glow Jars", "반짝 유리병"], genre: ["Color sort puzzle", "색 정렬 퍼즐"], style: ["Night sky, soft glow", "밤하늘, 은은한 빛"],
+    input: ["Tap", "탭"], kb: 279, sw: ["#0d1233", "#ffd75e", "#6ff2c0", "#ff8fc7"] },
+  { file: "momo-oven-playable.html", name: ["Momo's Oven", "모모의 오븐"], genre: ["Merge puzzle", "합치기(머지) 퍼즐"], style: ["Cartoon, bold outlines", "만화풍, 굵은 외곽선"],
+    input: ["Drag", "끌어다 놓기"], kb: 273, sw: ["#bfeee2", "#ff7fa6", "#ffd166", "#4a2c2a"] },
+  { file: "trio-tiles-playable.html", name: ["Shape Trio", "모양 셋"], genre: ["Triple tile match", "타일 3개 맞추기"], style: ["Flat poster, primary colors", "도형 포스터풍, 원색"],
+    input: ["Tap", "탭"], kb: 259, sw: ["#f4efe6", "#e8472b", "#2b59c3", "#f5b700"] }
+];
+var TEXT = {
+  title: ["Playable Ad Samples", "플레이어블 광고 견본"],
+  lead: ["Four playable ads in four genres and four art styles. Pick one and play it right here: hand tutorial, 15-30 seconds of play, then the end card.",
+    "장르와 그림체가 서로 다른 플레이어블 광고 네 편입니다. 하나를 골라 여기서 바로 해 보세요. 손가락 안내, 15~30초 플레이, 종료 카드 순서입니다."],
+  restart: ["Restart", "처음부터"], open: ["Open in a new tab", "새 탭에서 열기"], close: ["Close", "닫기"],
+  specTitle: ["What every sample has in common", "모든 견본의 공통 사양"],
+  play: ["Play", "해 보기"]
+};
+var SPECS = [
+  ["One self-contained HTML file per ad, 260-300 KB, no external requests", "광고 하나가 HTML 파일 하나, 260~300KB, 외부 요청 없음"],
+  ["Art drawn in code, synthesized sound, only the used font glyphs embedded", "그림은 코드로 그리고 소리는 합성, 글꼴은 쓰는 글자만 포함"],
+  ["Install button wired for MRAID (mraid.open) with hooks for Meta, Google and Mintegral", "설치 버튼은 MRAID(mraid.open) 연결, Meta·Google·Mintegral용 호출 포함"],
+  ["Waits for MRAID ready and viewable; sound starts only after the first touch", "MRAID ready·viewable 대기, 소리는 첫 터치 뒤에만 재생"],
+  ["Portrait layout that also fits landscape; English and Korean text", "세로 기준이며 가로에서도 맞춰짐, 영어·한국어 문구"],
+  ["End card also appears after 12 s without input or after a time limit", "12초 무입력이나 시간 상한에서도 종료 카드로 전환"]
+];
+var lang = /^ko/i.test(navigator.language || "") ? 1 : 0, cur = 0;
+var $ = function (id) { return document.getElementById(id); };
+function src() { return SAMPLES[cur].file + "?lang=" + (lang ? "ko" : "en"); }
+function load() { $("frame").src = src(); $("open").href = src(); }
+function render() {
+  document.documentElement.lang = lang ? "ko" : "en";
+  document.title = TEXT.title[lang];
+  Array.prototype.forEach.call(document.querySelectorAll("[data-t]"), function (el) { el.textContent = TEXT[el.getAttribute("data-t")][lang]; });
+  $("en").className = lang ? "" : "on"; $("ko").className = lang ? "on" : "";
+  $("specs").innerHTML = "";
+  SPECS.forEach(function (s) { var li = document.createElement("li"); li.textContent = s[lang]; $("specs").appendChild(li); });
+  var list = $("list");
+  list.innerHTML = "";
+  SAMPLES.forEach(function (s, i) {
+    var b = document.createElement("button");
+    b.className = "item" + (i === cur ? " on" : "");
+    var sw = document.createElement("span"); sw.className = "sw";
+    s.sw.forEach(function (c) { var e = document.createElement("i"); e.style.background = c; sw.appendChild(e); });
+    var body = document.createElement("span");
+    var h = document.createElement("h2"); h.textContent = s.name[lang];
+    var m = document.createElement("div"); m.className = "meta"; m.textContent = s.genre[lang] + " · " + s.style[lang];
+    var tags = document.createElement("div"); tags.className = "tags";
+    [s.input[lang], s.kb + " KB", TEXT.play[lang] + " ▸"].forEach(function (t) { var e = document.createElement("span"); e.className = "tag"; e.textContent = t; tags.appendChild(e); });
+    body.appendChild(h); body.appendChild(m); body.appendChild(tags);
+    b.appendChild(sw); b.appendChild(body);
+    b.addEventListener("click", function () { cur = i; render(); load(); $("stage").classList.add("open"); });
+    list.appendChild(b);
+  });
+}
+$("en").addEventListener("click", function () { lang = 0; render(); load(); });
+$("ko").addEventListener("click", function () { lang = 1; render(); load(); });
+$("restart").addEventListener("click", load);
+$("close").addEventListener("click", function () { $("stage").classList.remove("open"); $("frame").src = "about:blank"; });
+render();
+if (window.matchMedia("(min-width: 821px)").matches) load();
+</script>
+</body>
+</html>
